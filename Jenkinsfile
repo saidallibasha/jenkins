@@ -4,6 +4,16 @@ pipeline{
     tools{
         maven 'localMaven'
     }
+
+    parameters{
+        string(name: 'tomcat_dev', defaultValue: '35.154.46.110', description: 'staging_server')
+        string(name: 'tomcat_prod', defaultValue: '13.233.224.57', description: 'production_server')
+    }
+
+    triggers{
+        pollSCM('* * * * *')
+    }
+
     stages{
         stage("Build"){
             steps{
@@ -19,19 +29,17 @@ pipeline{
                 }
             }
         }
-        stage('Deploy to staging'){
-            steps{
-                timeout(time:5, unit:'DAYS'){
-                    input message:'approve production deployment?'
+        stage('Deployments'){
+            parallel{
+                stage('Deploy to staging'){
+                    steps{
+                        sh "scp -i /home/saidalli/Downloads/saidalli.pem **/target/*.war ec2-user@${params.tomcat_dev}:/var/lib/tomcat7/webapps"
+                    }
                 }
-                build job: 'deploy-to-staging'
-            }
-            post{
-                success{
-                    echo "Deployed to production"
-                }
-                failure{
-                    echo "Deployment failed"
+                stage('Deploy to staging'){
+                    steps{
+                        sh "scp -i /home/saidalli/Downloads/saidalli.pem **/target/*.war ec2-user@${params.tomcat_prod}:/var/lib/tomcat7/webapps"
+                    }
                 }
             }
         }
