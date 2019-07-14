@@ -1,33 +1,19 @@
 pipeline{
     agent any
-    
     stages{
-        stage("A"){
+        stage("Build"){
             steps{
-                echo "========executing A========"
+                sh " mvn clean package "
             }
             post{
-                always{
-                    echo "========always========"
-                }
                 success{
-                    echo "========A executed successfully========"
+                    echo " Build successful"
+                    archiveArtifacts artifacts: "**/target/*.war"
                 }
                 failure{
-                    echo "========A execution failed========"
+                    echo " Build failed "
                 }
             }
-        }
-    }
-    post{
-        always{
-            echo "========always========"
-        }
-        success{
-            echo "========pipeline executed successfully ========"
-        }
-        failure{
-            echo "========pipeline execution failed========"
         }
     }
 }
