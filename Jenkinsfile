@@ -36,7 +36,7 @@ pipeline{
                         sh "scp -i /home/saidalli/Downloads/saidalli.pem **/target/*.war ec2-user@${params.tomcat_dev}:/var/lib/tomcat7/webapps"
                     }
                 }
-                stage('Deploy to staging'){
+                stage('Deploy to production'){
                     steps{
                         sh "scp -i /home/saidalli/Downloads/saidalli.pem **/target/*.war ec2-user@${params.tomcat_prod}:/var/lib/tomcat7/webapps"
                     }
